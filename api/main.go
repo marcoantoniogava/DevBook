@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/src/config"
 	"api/src/router"
 	"fmt"
 	"log"
@@ -8,8 +9,12 @@ import (
 )
 
 func main() {
+	config.Carregar()
+	
+	fmt.Println(config.StringConexaoBanco)
+
 	fmt.Println("Rodando API!")
 	r := router.Gerar()
 
-	log.Fatal(http.ListenAndServe(":5000", r)) //Roda a API no endereço 5000
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), r)) //Roda a API
 }
