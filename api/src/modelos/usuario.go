@@ -8,7 +8,7 @@ import (
 
 // Usuario representa um usuário utilizando a rede social
 type Usuario struct {
-	ID       uint64    `json:"id,omitempty"`
+	ID       uint64    `json:"id,omitempty"` //omitempty faz com que o campo seja ignorado se estiver vazio
 	Nome     string    `json:"nome,omitempty"`
 	Nick     string    `json:"nick,omitempty"`
 	Email    string    `json:"email,omitempty"`
@@ -28,24 +28,25 @@ func (usuario *Usuario) Preparar() error {
 
 func (usuario *Usuario) validar() error {
 	if usuario.Nome == "" {
-		return errors.New("O nome é obrigatório e não pode estar em branco")
+		return errors.New("o nome é obrigatório e não pode estar em branco")
 	}
 
 	if usuario.Nick == "" {
-		return errors.New("O nick é obrigatório e não pode estar em branco")
+		return errors.New("o nick é obrigatório e não pode estar em branco")
 	}
 
 	if usuario.Email == "" {
-		return errors.New("O e-mail é obrigatório e não pode estar em branco")
+		return errors.New("o e-mail é obrigatório e não pode estar em branco")
 	}
 
 	if usuario.Senha == "" {
-		return errors.New("A senha é obrigatória e não pode estar em branco")
+		return errors.New("o senha é obrigatória e não pode estar em branco")
 	}
 
 	return nil
 }
 
+//formatar vai formatar o usuário recebido 
 func (usuario *Usuario) formatar() {
 	usuario.Nome = strings.TrimSpace(usuario.Nome) //Remove espaços em branco do nome
 	usuario.Nick = strings.TrimSpace(usuario.Nick)

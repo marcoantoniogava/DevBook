@@ -21,7 +21,7 @@ var (
 func Carregar() {
 	var erro error
 
-	if erro := godotenv.Load(); erro != nil {
+	if erro := godotenv.Load(); erro != nil { //tudo que tem "env" no nome é uma variável de ambiente que é pega do arquivo .env
 		log.Fatal(erro)
 	}
 

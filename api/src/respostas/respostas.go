@@ -8,9 +8,10 @@ import (
 
 //JSON vai receber um statusCode, colocar ele no header, e pegar os dados genéricos e transformar em JSON
 func JSON(w http.ResponseWriter, statusCode int, dados interface{}) {
-	w.WriteHeader(statusCode)
+	w.Header().Set("Content-Type", "application/json") //setando o tipo de conteúdo a ser retornado como JSON
+	w.WriteHeader(statusCode) //WriteHeader retorna o código de status
 
-	if erro := json.NewEncoder(w).Encode(dados); erro != nil {
+	if erro := json.NewEncoder(w).Encode(dados); erro != nil { //Encoder transforma dados em JSON
 		log.Fatal(erro)
 	}
 }
