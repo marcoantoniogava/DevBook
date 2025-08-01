@@ -28,7 +28,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if erro = usuario.Preparar(); erro != nil {
+	if erro = usuario.Preparar("cadastro"); erro != nil { //recebe o cadastro como parametro, para quando chegar no método de validar, ver que a etapa == cadastro, e se a senha estiver em branco vai fazer o erro q falta senha
 		respostas.Erro(w, http.StatusBadRequest, erro) //recebe 3 parâmetros: resposta, código de status e mensagem de erro
 		return
 	}
@@ -53,7 +53,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 // BuscarUsuarios busca todos os usuários salvos no banco
 func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario")) //converte a string para minuscula, vai trazer tudo que tiver na query (rota) e vai pegar o valor do campo usuario
-	db, erro := banco.Conectar() //conecta ao banco de dados
+	db, erro := banco.Conectar()                                //conecta ao banco de dados
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
 		return
@@ -87,7 +87,7 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db) //criando um novo repositorio de usuarios
-	usuario, erro := repositorio.BuscarPorID(usuarioID) //chamando o metodo buscar por id do repositorio de usuarios, passando o id do usuario como parâmetro
+	usuario, erro := repositorio.BuscarPorID(usuarioID)       //chamando o metodo buscar por id do repositorio de usuarios, passando o id do usuario como parâmetro
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
 		return
@@ -98,7 +98,45 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 
 // AtualizarUsuario altera as informações de um usuário no banco
 func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Atualizando Usuário!"))
+	parametros := mux.Vars(r) //mux.Vars recebe a requisição e retorna um map com os parâmetros da rota
+
+	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64) //converte o id do usuario de string para uint64
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	corpoRequisicao, erro := io.ReadAll(r.Body) //lê o corpo da requisição
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	var usuario modelos.Usuario
+	if erro = json.Unmarshal(corpoRequisicao, &usuario); erro != nil { //json.Unmarshall converte o corpo da requisição em um objeto do tipo usuario
+		respostas.Erro(w, http.StatusBadRequest, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	if erro = usuario.Preparar("edicao"); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
+	if erro = repositorio.Atualizar(usuarioID, usuario); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
 // DeletarUsuario exclui as informações de um usuário do banco

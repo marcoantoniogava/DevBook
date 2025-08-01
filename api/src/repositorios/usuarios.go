@@ -41,9 +41,9 @@ func (repositorio Usuarios) Criar(usuario modelos.Usuario) (uint64, error) { //M
 }
 
 // Buscar traz todos os usuarios que atendem um filtro de nome ou nick
-func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error) { //recebe um nome ou nick e retorna uma lista de usuarios e um erro
+func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error) {
 	nomeOuNick = fmt.Sprintf("%%%s%%", nomeOuNick) //%nomeOuNick%
-
+	//func recebe um nome ou nick e retorna uma lista de usuarios e um erro
 	linhas, erro := repositorio.db.Query(
 		"select id, nome, nick, email, criadoEm from usuarios where nome like ? or nick like ?", //vai procurar por um cara que tenha o nome ou nick igual ao nomeOuNick
 		nomeOuNick, nomeOuNick, //são as duas "?"
@@ -72,6 +72,7 @@ func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error)
 
 		usuarios = append(usuarios, usuario) //adiciona à lista de usuarios, o usuario que acabou de ser lido
 	}
+
 	return usuarios, nil
 }
 
@@ -101,4 +102,21 @@ func (repositorio Usuarios) BuscarPorID(ID uint64) (modelos.Usuario, error) {
 	}
 
 	return usuario, nil
+}
+
+// Atualizar altera as informações de um usuario no banco de dados
+func (repositorio Usuarios) Atualizar(ID uint64, usuario modelos.Usuario) error {
+	statement, erro := repositorio.db.Prepare(
+		"update usuarios set nome = ?, nick = ?, email = ? where id = ?",
+	)
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close() //fecha a conexão com o statement
+
+	if _, erro = statement.Exec(usuario.Nome, usuario.Nick, usuario.Email, ID); erro != nil { //_ para ignorar o 1° valor retornado pelo Exec, ID é o id q ta no parametro
+		return erro
+	}
+
+	return nil
 }
