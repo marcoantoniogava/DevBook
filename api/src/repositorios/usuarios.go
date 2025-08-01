@@ -60,7 +60,7 @@ func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error)
 	for linhas.Next() { //itera sobre as linhas
 		var usuario modelos.Usuario //cria um usuario para cada linha
 
-		if erro = linhas.Scan(// vai ler cada linha e atribuir os valores a cada campo do usuario
+		if erro = linhas.Scan( // vai ler cada linha e atribuir os valores a cada campo do usuario
 			&usuario.ID,
 			&usuario.Nome,
 			&usuario.Nick,
@@ -72,6 +72,33 @@ func (repositorio Usuarios) Buscar(nomeOuNick string) ([]modelos.Usuario, error)
 
 		usuarios = append(usuarios, usuario) //adiciona à lista de usuarios, o usuario que acabou de ser lido
 	}
-
 	return usuarios, nil
+}
+
+// BuscarPorId traz um usuario pelo seu id
+func (repositorio Usuarios) BuscarPorID(ID uint64) (modelos.Usuario, error) {
+	linhas, erro := repositorio.db.Query(
+		"select id, nome, nick, email, criadoEm from usuarios where id = ?",
+		ID,
+	)
+	if erro != nil {
+		return modelos.Usuario{}, erro //retorna um usuario vazio e o erro
+	}
+	defer linhas.Close() //fecha a conexão com as linhas
+
+	var usuario modelos.Usuario //cria o usuario para receber os dados da linha
+
+	if linhas.Next() { //se houver uma linha,
+		if erro = linhas.Scan( //vai ler os dados
+			&usuario.ID, //& serve para passar o endereço da variavel, não o valor, para que o Scan possa alterar o valor da variavel
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+			&usuario.CriadoEm,
+		); erro != nil {
+			return modelos.Usuario{}, erro
+		}
+	}
+
+	return usuario, nil
 }
