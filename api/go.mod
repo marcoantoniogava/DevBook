@@ -11,4 +11,5 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/badoux/checkmail v1.2.4 // indirect
+	golang.org/x/crypto v0.40.0 // indirect
 )
