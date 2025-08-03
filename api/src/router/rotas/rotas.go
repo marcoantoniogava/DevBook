@@ -17,6 +17,7 @@ type Rota struct {
 //Configurar coloca todas as rotas dentro do router
 func Configurar(r *mux.Router) *mux.Router {
 	rotas := rotasUsuarios //Pega as rotas definidas
+	rotas = append(rotas, rotaLogin) //Adiciona a rota de login
 
 	for _, rota := range rotas { //Para cada rota...
 		r.HandleFunc(rota.URI, rota.Funcao).Methods(rota.Metodo) //Registra no router: "quando vier requisição X, chame a função Y"
