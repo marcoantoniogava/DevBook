@@ -2,6 +2,10 @@ package autenticacao
 
 import (
 	"api/src/config"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -15,4 +19,37 @@ func CriarToken(usuarioID uint64) (string, error) { //retorna o token e um erro
 	permissoes["usuarioId"] = usuarioID //usuario que é dono do token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissoes) //criando token novo a partir dos claims que foram criados, passa o método de signing HS256, e as permissoes que ele vai ter
 	return token.SignedString([]byte(config.SecretKey)) //secretkey, chave que vai ser usada para fazer a assinatura e garantir a autenticidade do token
+}
+
+//ValidarToken verifica se o token passado na requisição é válido
+func ValidarToken(r *http.Request) error {
+	tokenString := extrairToken(r)
+	token, erro := jwt.Parse(tokenString, retornarChaveDeVerificacao)
+	if erro != nil {
+		return erro
+	}
+
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return nil
+	}
+
+	return errors.New("token inválido")
+}
+
+func extrairToken(r *http.Request) string { //pega oq tiver no authorization do request e joga na variavel token
+	token := r.Header.Get("Authorization")
+
+	if len(strings.Split(token, " ")) == 2 { //se tiver o tamanho de 2, retorna a 2° palavra
+		return strings.Split(token, " ")[1] //2° palavra
+	}
+
+	return "" //se n tiver duas posicoes retorna uma string em branco
+}
+
+func retornarChaveDeVerificacao(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("método de assinatura inesperado! %v", token.Header["alg"])
+	}
+
+	return []byte(config.SecretKey), nil  // <-- Adicione []byte() aqui
 }
