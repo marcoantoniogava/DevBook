@@ -41,7 +41,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db) //criando um novo repositorio de usuarios
-	usuario.ID, erro = repositorio.Criar(usuario)             //chamando o metodo criar do repositorio de usuarios
+	usuario.ID, erro = repositorio.Criar(usuario) //chamando o metodo criar do repositorio de usuarios (inserindo)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro) //recebe 3 parâmetros: resposta, código de status e mensagem de erro
 		return
