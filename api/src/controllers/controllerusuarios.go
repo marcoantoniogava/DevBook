@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/autenticacao"
 	"api/src/banco"
 	"api/src/modelos"
 	"api/src/repositorios"
 	"api/src/respostas"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -41,7 +43,7 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db) //criando um novo repositorio de usuarios
-	usuario.ID, erro = repositorio.Criar(usuario) //chamando o metodo criar do repositorio de usuarios (inserindo)
+	usuario.ID, erro = repositorio.Criar(usuario)             //chamando o metodo criar do repositorio de usuarios (inserindo)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro) //recebe 3 parâmetros: resposta, código de status e mensagem de erro
 		return
@@ -103,6 +105,17 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64) //converte o id do usuario de string para uint64
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnauthorized, erro) //chama a função erro lá do respostas.go e envia o erro para o usuario
+		return
+	}
+
+	if usuarioID != usuarioIDNoToken { //nao deixa os usuarios alterarem informações que não são deles (dos outros)
+		respostas.Erro(w, http.StatusForbidden, errors.New("nao é possivel atualizar um usuario que nao seja o seu")) //chama a função erro lá do respostas.go e envia o erro para o usuario
 		return
 	}
 
