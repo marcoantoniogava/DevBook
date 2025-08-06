@@ -17,7 +17,7 @@ func NovoRepositorioDeUsuarios(db *sql.DB) *Usuarios {
 }
 
 // Criar insere um usuario no banco de dados
-func (repositorio Usuarios) Criar(usuario modelos.Usuario) (uint64, error) { 
+func (repositorio Usuarios) Criar(usuario modelos.Usuario) (uint64, error) {
 	//Método vai estar dentro do repositório de usuários, vai criar um usuário, vai receber um parâmetro (um modelo de usuario) e vai retornar um id e um erro
 	statement, erro := repositorio.db.Prepare(
 		"insert into usuarios (nome, nick, email, senha) values(?, ?, ?, ?)",
@@ -137,7 +137,7 @@ func (repositorio Usuarios) Deletar(ID uint64) error {
 	return nil
 }
 
-//BuscarPorEmail busca um usuário por email e retorna o seu id e senha com hash
+// BuscarPorEmail busca um usuário por email e retorna o seu id e senha com hash
 func (repositorio Usuarios) BuscarPorEmail(email string) (modelos.Usuario, error) {
 	linha, erro := repositorio.db.Query("select id, senha from usuarios where email = ?", email)
 	if erro != nil {
@@ -154,4 +154,20 @@ func (repositorio Usuarios) BuscarPorEmail(email string) (modelos.Usuario, error
 	}
 
 	return usuario, nil
+}
+
+// Seguir permite que um usuário siga outro
+func (repositorio Usuarios) Seguir(usuarioID, seguidorID uint64) error {
+	statement, erro := repositorio.db.Prepare("insert ignore into seguidores (usuario_id, seguidor_id) values (?, ?)") //se ja existir uma linha na tabela com os valores que vao ser inseridos, o ignore vai ignorar
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(usuarioID, seguidorID); erro != nil {
+		return erro
+	}
+
+	return nil
+	
 }
