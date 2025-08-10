@@ -169,5 +169,52 @@ func (repositorio Usuarios) Seguir(usuarioID, seguidorID uint64) error {
 	}
 
 	return nil
+
+}
+
+// PararDeSeguir permite que um usuário pare de seguir o outro
+func (repositorio Usuarios) PararDeSeguir(usuarioID, seguidorID uint64) error {
+	statement, erro := repositorio.db.Prepare("delete from seguidores where usuario_id = ? and seguidor_id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(usuarioID, seguidorID); erro != nil {
+		return erro
+	}
+
+	return nil
+
+}
+
+// BuscarSeguidores trás todos os seguidores de um usuário
+func (repositorio Usuarios) BuscarSeguidores(usuarioID uint64) ([]modelos.Usuario, error) {
+	linhas, erro := repositorio.db.Query(`
+	select u.id, u.nome, u.nick, u.email, u.criadoEm
+	from usuarios u inner join seguidores s on u.id = s.seguidor_id where s.usuario_id = ?
+	`, usuarioID)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var usuarios []modelos.Usuario
+	for linhas.Next() {
+		var usuario modelos.Usuario
+
+		if erro = linhas.Scan(
+			&usuario.ID,
+			&usuario.Nome,
+			&usuario.Nick,
+			&usuario.Email,
+			&usuario.CriadoEm,
+		); erro != nil {
+			return nil, erro
+		}
+
+		usuarios = append(usuarios, usuario)
+	}
+
 	
 }
