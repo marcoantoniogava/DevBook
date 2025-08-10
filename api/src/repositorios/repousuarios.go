@@ -216,5 +216,5 @@ func (repositorio Usuarios) BuscarSeguidores(usuarioID uint64) ([]modelos.Usuari
 		usuarios = append(usuarios, usuario)
 	}
 
-	
+	return usuarios, nil
 }
