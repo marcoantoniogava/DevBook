@@ -19,6 +19,7 @@ type Rota struct {
 func Configurar(r *mux.Router) *mux.Router {
 	rotas := rotasUsuarios //Pega as rotas definidas
 	rotas = append(rotas, rotaLogin) //Adiciona a rota de login
+	rotas = append(rotas, rotasPublicacoes...) //... pra entender q tem q dar um append pra cada item no slice
 
 	for _, rota := range rotas { //Para cada rota...
 
