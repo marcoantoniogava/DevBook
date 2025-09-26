@@ -1,29 +1,38 @@
-<div class="jumbotron">
+{{ define "curtidas" }}
+<span> {{ .Curtidas }} curtidas </span>
+{{ end }}
 
+{{ define "editar" }}
+<a href="/editar">Editar Publicação</a>
+{{ end }}
 
-    {{ if (eq .AutorID $.UsuarioID) }}
-    <p>Botões curtir, editar e excluir</p>
-    {{ else }}
-    <p>Botão curtir</p>
-    {{ end }}
-
-</div>
+{{ define "deletar" }}
+<a href="/deletar">Deletar Publicação</a>
+{{ end }}
 
 {{ define "cabecalho-publicacao" }}
 <h1 class="display-4">{{ .Titulo }}</h1>
 <p class="lead">{{ .Conteudo }}</p>
-<a href="#"> {{ .AutorNick }} - {{ .CriadaEm }} </a>
+<a href="#"> {{ .AutorNick }} - {{ .CriadaEm.Format "02/01/2006 3:4" }} </a>
 <hr class="my-4">
 {{ end }}
 
 {{ define "publicacao-com-permissao" }}
 <div class="jumbotron" data-publicacao-id="{{ .ID }}">
     {{ template "cabecalho-publicacao" .}}
+    <p>
+        {{ template "curtidas" . }}
+        {{ template "editar" . }}
+        {{ template "deletar" . }}
+    </p>
 </div>
 {{ end }}
 
 {{ define "publicacao-sem-permissao" }}
 <div class="jumbotron" data-publicacao-id="{{ .ID }}">
     {{ template "cabecalho-publicacao" .}}
+    <p>
+        {{ template "curtidas" . }}
+    </p>
 </div>
 {{ end }}
