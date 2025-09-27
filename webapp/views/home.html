@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevBook</title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
 </head>
 
 <body>
@@ -36,7 +36,7 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
                 {{ range .Publicacoes }}
-                    {{ if eq .AutorID $.UsuarioID }}
+                    {{ if (eq .AutorID $.UsuarioID) }}
                         {{ template "publicacao-com-permissao" . }}
                     {{ else }}
                         {{ template "publicacao-sem-permissao" . }}
