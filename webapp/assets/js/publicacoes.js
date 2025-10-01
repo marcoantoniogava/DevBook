@@ -3,6 +3,8 @@ $("#nova-publicacao").on("submit", criarPublicacao); //# pra id, . pra classe
 $(document).on("click", ".curtir-publicacao", curtirPublicacao);
 $(document).on("click", ".descurtir-publicacao", descurtirPublicacao);
 
+$("#atualizar-publicacao").on("click", atualizarPublicacao);
+
 function criarPublicacao(evento) {
     evento.preventDefault();
 
@@ -72,4 +74,25 @@ function descurtirPublicacao(evento) {
     }).always(function () {
         elementoClicado.prop("disabled", false);
     });
+}
+
+function atualizarPublicacao(evento) {
+    $(this).prop("disabled", true);
+
+    const publicacaoId = $(this).data("publicacao-id");
+
+    $.ajax({
+        url: `/publicacoes/${publicacaoId}`,
+        method: "PUT",
+        data: {
+            titulo: $("#titulo").val(),
+            conteudo: $("#conteudo").val()
+        }
+    }).done(function() {
+        alert("Publicação atualizada com sucesso!");
+    }).fail(function() {
+        alert("Erro ao atualizar a publicação.");
+    }).always(function() {
+        $("#atualizar-publicacao").prop("disabled", false);
+    })
 }
