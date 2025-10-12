@@ -8,11 +8,11 @@ function pararDeSeguir() {
     $(this).prop("disabled", true);
 
     $.ajax({
-        url : `/usuarios/${usuarioId}/parar-de-seguir`,
+        url: `/usuarios/${usuarioId}/parar-de-seguir`,
         method: "POST",
-    }).done(function() {
+    }).done(function () {
         window.location = `/usuarios/${usuarioId}`;
-    }).fail(function() {
+    }).fail(function () {
         Swal.fire("Ops...", "Erro ao parar de seguir o usuário", "error");
         $("#parar-de-seguir").prop("disabled", false);
     });
@@ -23,11 +23,11 @@ function seguir() {
     $(this).prop("disabled", true);
 
     $.ajax({
-        url : `/usuarios/${usuarioId}/seguir`,
+        url: `/usuarios/${usuarioId}/seguir`,
         method: "POST",
-    }).done(function() {
+    }).done(function () {
         window.location = `/usuarios/${usuarioId}`;
-    }).fail(function() {
+    }).fail(function () {
         Swal.fire("Ops...", "Erro ao seguir o usuário", "error");
         $("#seguir").prop("disabled", false);
     });
@@ -37,19 +37,19 @@ function editar(evento) {
     evento.preventDefault();
 
     $.ajax({
-        url : "/editar-usuario",
+        url: "/editar-usuario",
         method: "PUT",
         data: {
             nome: $("#nome").val(),
             email: $("#email").val(),
             nick: $("#nick").val(),
         }
-    }).done(function() {
+    }).done(function () {
         Swal.fire("Sucesso", "Usuário atualizado com sucesso", "success")
-        .then(function() {
-            window.location = "/perfil";
-        });
-    }).fail(function() {
+            .then(function () {
+                window.location = "/perfil";
+            });
+    }).fail(function () {
         Swal.fire("Ops...", "Erro ao atualizar o usuário", "error");
     });
 }
@@ -63,18 +63,18 @@ function atualizarSenha(evento) {
     }
 
     $.ajax({
-        url : "/atualizar-senha",
-        method: "PUT",
+        url: "/atualizar-senha",
+        method: "POST",
         data: {
-            senhaAtual: $("#senha-atual").val(),
-            novaSenha: $("#nova-senha").val(),
+            atual: $("#senha-atual").val(),
+            nova: $("#nova-senha").val(),
         }
-    }).done(function() {
+    }).done(function () {
         Swal.fire("Sucesso!", "A senha atualizada com sucesso!", "success")
-        .then(function() {
-            window.location = "/perfil";
-        })
-    }).fail(function() {
+            .then(function () {
+                window.location = "/perfil";
+            })
+    }).fail(function () {
         Swal.fire("Ops...", "Erro ao atualizar a senha!", "error");
     });
 }
